@@ -118,19 +118,19 @@ async def _(event: GroupMessageEvent, result: Arparma) -> None:
         weathers: list[WeatherData] = []
         for location in locations:
             async with httpx.AsyncClient() as ctx:
-                res: httpx.Response = await ctx.get(
+                response: httpx.Response = await ctx.get(
                     f'{NOW_WEATHER_SEARCH_BASE_URL}location={location.code}&key={plugin_config.qweather_api_key}'
                     if mode == '气温'
                     else f'{DAILY_WEATHER_SEARCH_BASE_URL}location={location.code}&key={plugin_config.qweather_api_key}'
                 )
-                if res.status_code == 200:
+                if response.status_code == 200:
                     if mode == '气温':
-                        now_weather: NowWeather = NowWeather(**res.json())
+                        now_weather: NowWeather = NowWeather(**response.json())
                         weathers.append(
                             WeatherData(name=location.name, temp=now_weather.now.temp)
                         )
                     elif mode == '温差':
-                        daily_weather: DailyWeather = DailyWeather(**res.json())
+                        daily_weather: DailyWeather = DailyWeather(**response.json())
                         weathers.append(
                             WeatherData(
                                 name=location.name,
@@ -179,9 +179,10 @@ async def _(event: GroupMessageEvent, result: Arparma) -> None:
                         url = img_url
         if len(url) > 0:
             msg = UniMessage().image(url=url)
+            await weather_rank.finish(msg)
         else:
-            msg = UniMessage().text('获取图片失败')
-        await weather_rank.finish(msg)
+            msgg = UniMessage().text('获取图片失败')
+            await weather_rank.finish(msgg)
 
     if '当地天气' in result.subcommands:
         # 如果匹配至'当地天气'，则获取该地气温并绘制当地天气图

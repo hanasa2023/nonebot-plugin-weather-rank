@@ -1,4 +1,4 @@
-from typing import Self
+from typing import cast
 
 from loguru import logger
 from nonebot import require
@@ -17,12 +17,12 @@ class LocationInfo(BaseModel):
 
 
 class DBService:
-    _instance = None
+    _instance: 'DBService | None' = None
 
-    def __new__(cls, *args, **kwargs) -> Self:
+    def __new__(cls, *args, **kwargs) -> 'DBService':
         if cls._instance is None:
             cls._instance = super(DBService, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
+        return cast('DBService', cls._instance)
 
     def __init__(self) -> None:
         if not hasattr(self, 'session'):
@@ -94,7 +94,7 @@ class DBService:
             await session.commit()
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def get_instance(cls) -> 'DBService':
         """获取Weather单例
 
         Returns:
@@ -102,4 +102,4 @@ class DBService:
         """
         if cls._instance is None:
             cls._instance = cls()
-        return cls._instance
+        return cast('DBService', cls._instance)
