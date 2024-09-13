@@ -1,6 +1,8 @@
 <div align="center">
 
-[![NonebotLogo](./docs/NoneBotPlugin.svg)](https://nonebot.dev/)
+<a href="https://v2.nonebot.dev/store">
+    <img src="./docs/NoneBotPlugin.svg" width="300" alt="logo">
+</a>
 
 # nonebot-plugin-weatherpk
 
