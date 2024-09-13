@@ -4,7 +4,7 @@ from .config import Config
 from .utils.schema import Weather  # noqa: F401
 from .weather_rank import weather_rank, weather_rank_helper  # noqa: F401
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __plugin_meta__ = PluginMetadata(
     name='weather-rank',
     description='订阅地区的天气排行榜',
