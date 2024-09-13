@@ -1,0 +1,234 @@
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qweather-icons@1.3.0/font/qweather-icons.css" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    i {
+      color: #fff;
+      font-size: 16px;
+      padding: 8px;
+    }
+
+    .text1 {
+      color: #fff;
+      font-size: 52px;
+    }
+
+    .text2 {
+      color: #fff;
+      font-size: 32px;
+    }
+
+    .text3 {
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .text4 {
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .text5 {
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .text6 {
+      color: #fff;
+      font-size: 10px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 400px;
+      padding: 16px;
+      border-radius: 8px;
+      background-color: rgba(9, 13, 15, 1);
+    }
+
+    .main-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .row-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .col-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .col-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      padding: 8px;
+      margin: 8px;
+      border-radius: 8px;
+      background-color: rgba(27, 31, 41, 0.973);
+    }
+
+    .row-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 8px;
+      margin: 8px;
+      border-radius: 8px;
+      background-color: rgba(27, 31, 41, 0.973);
+    }
+
+    .aqi-bar-container {
+      width: 100%;
+      height: 4px;
+      margin: 8px 0;
+      background: linear-gradient(to right, #00e400, #7e0023);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .aqi-point {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      background-color: whitesmoke;
+      border-radius: 50%;
+      border: 2px solid black;
+    }
+
+    .row-container1 {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .row-container2 {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: center;
+    }
+
+    .mdi {
+      color: #fff;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    .temp-bar-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .temp-bar-background {
+      width: 200px;
+      height: 4px;
+      margin: 0 16px;
+      background: linear-gradient(to right, blue, cyan, green, yellow, red);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .temp-bar-mask {
+      height: 4px;
+      border-radius: 2px;
+      background-color: gray;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="main-card">
+      <span class="text2">我的位置</span>
+      <span class="text5">{{ data.location }}</span>
+      <span class="text1">{{ data.now_temp }}°</span>
+      <div class="row-container">
+        <div class="row-container">
+          <div class="col-container">
+            <span class="text5">最</span>
+            <span class="text5">高</span>
+          </div>
+          <span class="text2">{{ data.max_temp }}°</span>
+        </div>
+        <div class="row-container">
+          <div class="col-container">
+            <span class="text5">最</span>
+            <span class="text5">低</span>
+          </div>
+          <span class="text2">{{ data.min_temp }}°</span>
+        </div>
+      </div>
+      <span class="text4">{{ now_text }}</span>
+    </div>
+    <div class="col-card">
+      <span class="text4">{{ data.aqi }}-{{ data.air_category }}</span>
+      <div class="aqi-bar-container">
+        <div class="aqi-point"></div>
+      </div>
+      <span class="text5">当前AQI(CN)为{{ data.aqi }}。</span>
+    </div>
+    <div class="row-card">
+      {% for h_w in data.future_hourly_weather %}
+      <div class="col-container">
+        <span class="text4">{{ h_w.time }}时</span>
+        <i class="qi-{{ h_w.icon }}"></i>
+        <span class="text3">{{ h_w.temp }}°</span>
+      </div>
+      <div class="col-container"></div>
+      {% endfor %}
+    </div>
+    <div class="col-card">
+      <div class="row-container2">
+        <span class="material-symbols-outlined mdi">calendar_month</span>
+        <span class="text6">7日天气预报</span>
+      </div>
+      {% for d_w in data.future_daily_weather %}
+      <div class="row-container1">
+        <span class="text4">{{ d_w.week_day }}</span>
+        <i class="qi-{{ d_w.icon }}"></i>
+        <div class="temp-bar-container">
+          <span class="text4">{{ d_w.min_temp }}</span>
+          <div class="temp-bar-background">
+            <div class="temp-bar-mask" style="width: {{ d_w.left_width }}%;"></div>
+            <div class="temp-bar-mask" style="width: {{ d_w.right_width }}%; right: 0;"></div>
+          </div>
+          <span class="text4">{{ d_w.max_temp }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
