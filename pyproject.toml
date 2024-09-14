@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-weather-rank"
-version = "0.1.1"
+version = "0.1.2"
 description = "一个比较群友地区天气温度的插件"
 authors = ["hanasa2023 <hanasakayui2022@gmail.com>"]
 license = "MIT"
