@@ -7,7 +7,7 @@ from typing import Any
 import httpx
 from bs4 import BeautifulSoup, Tag
 from nonebot import logger, require
-from nonebot.adapters.onebot.v11 import GroupMessageEvent
+from nonebot.adapters import Event
 
 from ..config import plugin_config
 from ..utils.constant import (
@@ -89,8 +89,9 @@ async def _() -> None:
 
 
 @weather_rank.handle()
-async def _(event: GroupMessageEvent, result: Arparma) -> None:
+async def _(event: Event, result: Arparma) -> None:
     dbs: DBService = DBService.get_instance()
+    id: int = int(UniMessage.get_target(event).id)
 
     if '添加城市' in result.subcommands:
         # 如果匹配至'添加城市'子命令，则通过api获取城市地区码，并写入数据库
@@ -105,7 +106,7 @@ async def _(event: GroupMessageEvent, result: Arparma) -> None:
                     location_code: str = data[0]['id']
                     location_name: str = data[0]['name']
                     msg1: str = await dbs.add_location_for_group(
-                        event.group_id, location_code, location_name
+                        id, location_code, location_name
                     )
                     await weather_rank.finish(msg1)
             else:
@@ -116,7 +117,7 @@ async def _(event: GroupMessageEvent, result: Arparma) -> None:
         mode: str = result.subcommands['排行榜'].args['mode']
         if mode not in ['气温', '温差']:
             await weather_rank.finish('不支持的排行榜')
-        locations: list[LocationInfo] = await dbs.get_locations_in_group(event.group_id)
+        locations: list[LocationInfo] = await dbs.get_locations_in_group(id)
         weathers: list[WeatherData] = []
         for location in locations:
             async with httpx.AsyncClient() as ctx:
@@ -168,6 +169,7 @@ async def _(event: GroupMessageEvent, result: Arparma) -> None:
 
     if '气温地图' in result.subcommands:
         # 如果匹配至'气温地图'，则爬取中国天气网的气温地图并发送
+        await weather_rank.send('正在获取气温地图……')
         url = ''
         async with httpx.AsyncClient() as ctx:
             res = await ctx.get(TEMPERATURE_MAP_BASE_URL)
