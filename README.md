@@ -6,8 +6,9 @@
 
 # nonebot-plugin-weatherpk
 
-[![license](https://img.shields.io/github/license/hanasa2023/nonebot-plugin-weather-rank.svg)](./LICENSE)
+[![License](https://img.shields.io/github/license/hanasa2023/nonebot-plugin-weather-rank.svg)](./LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/nonebot-plugin-weather-rank.svg)](https://pypi.python.org/pypi/nonebot-plugin-ba-tools)
+![NoneBot](https://img.shields.io/badge/nonebot-2.3.0+-red.svg)
 ![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
 
 </div>
