@@ -57,6 +57,7 @@ async def template_element_to_pic(
         await page.goto(f'file://{template_path}')
         await page.set_content(html, wait_until='networkidle')
         await page.wait_for_timeout(wait)
-        return await page.locator(element).screenshot(
+        img: bytes = await page.locator(element).screenshot(
             type=type, quality=quality, omit_background=omit_background
         )
+        return img
