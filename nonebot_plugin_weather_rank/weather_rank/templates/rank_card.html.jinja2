@@ -1,21 +1,18 @@
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rank Card</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style type="text/css">
         @font-face {
-            font-family: 'MeiWeiTi';
-            src: url('./fonts/miaozi-meiweiti-2.ttf') format('truetype');
+            font-family: "MeiWeiTi";
+            src: url("./fonts/miaozi-meiweiti-2.ttf") format("truetype");
         }
 
         @font-face {
-            font-family: 'ComicSannsMonoNF';
-            src: url('./fonts/ComicShannsMonoNerdFont-Regular.otf') format('truetype');
-        }
-
-        body {
-            padding: 0;
-            margin: 0;
+            font-family: "ComicSannsMonoNF";
+            src: url("./fonts/ComicShannsMonoNerdFont-Regular.otf") format("truetype");
         }
 
         .container {
@@ -24,10 +21,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            color: #fbe9e7;
             border-radius: 8px;
-            background-image: url('./images/clr.png');
-            background-repeat: no-repeat;
-            background-size: cover;
+            background: linear-gradient(to bottom, #ff9e80, #ff5722);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .title {
@@ -37,8 +34,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgb(255, 70, 70);
-            font-family: 'ComicSannsMonoNF', 'MeiWeiTi';
+            background: linear-gradient(to right, #ff9e80, #ff5722, #ff9e80);
+            font-family: "ComicSannsMonoNF", "MeiWeiTi";
             font-size: 24px;
             font-weight: bold;
         }
@@ -47,26 +44,42 @@
             width: 400px;
             height: 60px;
             margin-bottom: 16px;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: #f4511e;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'ComicSannsMonoNF', 'MeiWeiTi';
+            font-family: "ComicSannsMonoNF", "MeiWeiTi";
             font-size: 16px;
             color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-1 {
+            width: 400px;
+            height: 60px;
+            margin-bottom: 16px;
+            background-color: #ff7043;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "ComicSannsMonoNF", "MeiWeiTi";
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .material1 {
-            color: #fcff3b;
+            color: #ffd700;
         }
 
         .material2 {
-            color: #c4c4c4;
+            color: #c0c0c0;
         }
 
         .material3 {
-            color: #ffa32a;
+            color: #cd7f32;
         }
     </style>
 </head>
@@ -75,26 +88,16 @@
     <div class="container">
         <div class="title">{{ mode }}排行榜</div>
         {% for data in datas %}
-        {% if loop.index == 1 %}
-        <div class="card"><span class="material-symbols-outlined material1">editor_choice</span><span>{{ loop.index }}
-                {{ data.name }} {{ data.temp }}°c</span>
-        </div>
-        {% elif loop.index == 2 %}
-        <div class="card"><span class="material-symbols-outlined material2">editor_choice</span><span>{{ loop.index }}
-                {{ data.name }} {{ data.temp }}°c</span>
-            </span>
-        </div>
-        {% elif loop.index == 3 %}
-        <div class="card"><span class="material-symbols-outlined material3">editor_choice</span><span>{{ loop.index }}
-                {{ data.name }} {{ data.temp }}°c</span>
-            </span>
-        </div>
-        {% else %}
-        <div class="card"><span>{{ loop.index }} {{ data.name }} {{ data.temp }}°c</span>
-        </div>
-        {% endif %}
-        {% endfor %}
+        {% if loop.index <= 3 %} <div class="card">
+            <span class="material-symbols-outlined material{{ loop.index }}">editor_choice</span>
+            <span>{{ loop.index }} {{ data.name }} {{ data.temp }}°C</span>
     </div>
-    </style>
-    </head>
+    {% else %}
+    <div class="card-1">
+        <span>{{ loop.index }} {{ data.name }} {{ data.temp }}°C</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+    </div>
+    </div>
 </body>
