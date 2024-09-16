@@ -70,15 +70,19 @@
 
 ### ✨ 功能介绍
 
-- [x] 添加订阅城市
+- [x] 添加订阅城市 <br>
       ![addCity](./docs/add_city.png)
-- [x] 查看已订阅城市气温/温差排行榜
+
+- [x] 查看已订阅城市气温/温差排行榜<br>
       ![rank](./docs/rank.png)
-- [x] 查看某地实时气温及预报
+
+- [x] 查看某地实时气温及预报<br>
       ![rank](./docs/weather.png)
-- [x] 查看全国气温地图(可能会有 1h 延迟)
+
+- [x] 查看全国气温地图(可能会有 1h 延迟)<br>
       ![rank](./docs/map.png)
-- [x] 获取插件帮助信息
+
+- [x] 获取插件帮助信息<br>
       ![rank](./docs/help.png)
 
 ### 🚩 TODO
