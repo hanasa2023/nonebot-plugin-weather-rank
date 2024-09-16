@@ -10,6 +10,7 @@ from nonebot import logger, require
 from nonebot.adapters import Event
 
 from ..config import plugin_config
+from ..utils.addition_for_htmlrender import md_to_pic, template_element_to_pic
 from ..utils.constant import (
     AIR_QUALITY_BASE_URL,
     CITY_SEARCH_BASE_URL,
@@ -40,12 +41,6 @@ from nonebot_plugin_alconna import (  # noqa: E402
     Subcommand,
     UniMessage,
     on_alconna,
-)
-
-require('nonebot_plugin_htmlrender')
-from nonebot_plugin_htmlrender import (  # noqa: E402
-    md_to_pic,
-    template_to_pic,
 )
 
 weather_rank_commands: Alconna[Any] = Alconna(
@@ -153,15 +148,13 @@ async def _(event: Event, result: Arparma) -> None:
         template_name: str = 'rank_card.html.jinja2'
 
         await weather_rank.send('正在生成排行榜……')
-        rank_img: bytes = await template_to_pic(
+        rank_img: bytes = await template_element_to_pic(
             template_path,
             template_name,
             templates={'datas': weathers, 'mode': mode},
-            pages={
-                'viewport': {'width': 432, 'height': len(weathers) * 76 + 72},
-                'base_url': f'file://{template_path}',
-            },
+            element='.container',
             wait=2,
+            omit_background=True,
         )
 
         msg2: UniMessage[Image] = UniMessage().image(raw=rank_img)
@@ -277,19 +270,13 @@ async def _(event: Event, result: Arparma) -> None:
                 template_n: str = 'weather_card.html.jinja2'
 
                 await weather_rank.send('正在生成天气图……')
-                weather_img: bytes = await template_to_pic(
+                weather_img: bytes = await template_element_to_pic(
                     template_p,
                     template_n,
                     templates={'data': weather_card_data},
-                    pages={
-                        'viewport': {
-                            'width': 432,
-                            'height': 453
-                            + len(weather_card_data.future_daily_weather) * 34,
-                        },
-                        'base_url': f'file://{template_p}',
-                    },
+                    element='.container',
                     wait=2,
+                    omit_background=True,
                 )
 
                 msg3: UniMessage[Image] = UniMessage().image(raw=weather_img)
