@@ -3,12 +3,15 @@ from __future__ import annotations
 from typing import cast
 
 from loguru import logger
-from nonebot_plugin_localstore import get_data_file
+from nonebot import require
 from pydantic import BaseModel
 from tortoise import Tortoise
 from tortoise.transactions import in_transaction
 
 from .schema import Weather
+
+require('nonebot_plugin_localsotre')
+from nonebot_plugin_localstore import get_data_file  # noqa: E402
 
 
 class LocationInfo(BaseModel):
