@@ -3,7 +3,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from .config import Config
 from .weather_rank import weather_rank, weather_rank_helper  # noqa: F401
 
-__version__ = '0.1.5'
+__version__ = '0.1.6'
 __plugin_meta__ = PluginMetadata(
     name='weather-rank',
     description='显示已订阅地区的天气排行榜',
