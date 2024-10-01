@@ -7,7 +7,7 @@
 # nonebot-plugin-weatherpk
 
 [![License](https://img.shields.io/github/license/hanasa2023/nonebot-plugin-weather-rank.svg)](./LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/nonebot-plugin-weather-rank.svg)](https://pypi.python.org/pypi/nonebot-plugin-ba-tools)
+[![PyPI](https://img.shields.io/pypi/v/nonebot-plugin-weather-rank.svg)](https://pypi.python.org/pypi/nonebot-plugin-weather-rank)
 ![NoneBot](https://img.shields.io/badge/nonebot-2.3.0+-red.svg)
 ![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
 
@@ -52,6 +52,16 @@
 
 </details>
 
+## 💥 破坏性更新
+
+- 若您正在使用 0.1.4 及以下版本，若需升级，则应当按照[nonebot-plugin-orm 文档](https://nonebot.dev/docs/best-practice/database/user)中的指南对数据进行删除
+
+```bash
+nb orm downgrade nonebot_plugin_wordcloud@base  # 降级数据库，删除数据
+```
+
+- 此插件从 0.1.5 版本开始使用 `tortoise-orm` 对数据库进行管理，移除对 `nonebot-plugin-orm` 的依赖。~~才不是因为 plugin-orm 的文档不全呢(x)~~
+
 ## 🎉 使用
 
 ### 💡 数据来源
@@ -95,12 +105,12 @@
 
 调用插件的主命令为"天气"
 
-|  子命令  | 权限 | 需要@ |                说明                 |          示例          |
-| :------: | :--: | :---: | :---------------------------------: | :--------------------: |
-| 添加城市 |  无  |  无   |       在此群聊中添加订阅城市        |  /天气 添加城市 上海   |
-|  排行榜  |  无  |  无   |     查看已订阅的城市天气排行榜      | /天气 排行榜 气温/温差 |
-| 当地天气 |  无  |  无   | 查看指定城市的当日天气及近 7 日天气 |  /天气 当地天气 上海   |
-| 气温地图 |  无  |  无   |  查看最近的时间节点全国的气温地图   |     /天气 气温地图     |
+|    子命令     | 权限 | 需要@ |                说明                 |           示例           |
+| :-----------: | :--: | :---: | :---------------------------------: | :----------------------: |
+| 添加/删除城市 |  无  |  无   |     在此群聊中添加/删除订阅城市     | /天气 添加/删除城市 上海 |
+|    排行榜     |  无  |  无   |     查看已订阅的城市天气排行榜      |  /天气 排行榜 气温/温差  |
+|   当地天气    |  无  |  无   | 查看指定城市的当日天气及近 7 日天气 |   /天气 当地天气 上海    |
+|   气温地图    |  无  |  无   |  查看最近的时间节点全国的气温地图   |      /天气 气温地图      |
 
 |   指令   | 权限 | 需要@ |       说明       |   示例    |
 | :------: | :--: | :---: | :--------------: | :-------: |

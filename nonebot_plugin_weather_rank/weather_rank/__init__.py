@@ -53,6 +53,10 @@ weather_rank_commands: Alconna[Any] = Alconna(
         '添加城市',
         Args['city', str, Field(completion=lambda: '请输入要添加的城市名称')],
     ),
+    Subcommand(
+        '删除城市',
+        Args['city', str, Field(completion=lambda: '请输入要删除城市的名称')],
+    ),
     Subcommand('气温地图'),
     Subcommand(
         '当地天气',
@@ -86,6 +90,7 @@ async def _() -> None:
 @weather_rank.handle()
 async def _(event: Event, result: Arparma) -> None:
     dbs: DBService = DBService.get_instance()
+    await dbs.init()
     id: int = int(UniMessage.get_target(event).id)
 
     if '添加城市' in result.subcommands:
@@ -104,6 +109,24 @@ async def _(event: Event, result: Arparma) -> None:
                         id, location_code, location_name
                     )
                     await weather_rank.finish(msg1)
+            else:
+                await weather_rank.finish('城市名称错误')
+
+    if '删除城市' in result.subcommands:
+        # 如果匹配至'删除城市'子命令，则通过api获取城市地区码，从数据库删除
+        del_city: str = result.subcommands['删除城市'].args['city']
+        async with httpx.AsyncClient() as ctx:
+            res = await ctx.get(
+                f'{CITY_SEARCH_BASE_URL}location={del_city}&key={plugin_config.qweather_api_key}'
+            )
+            if res.status_code == 200:
+                data = res.json()['location']
+                logger.error(data)
+                if data and len(data) > 0:
+                    location_code = data[0]['id']
+                    location_name = data[0]['name']
+                    d_msg: str = await dbs.remove_location_from_group(id, location_code)
+                    await weather_rank.finish(d_msg)
             else:
                 await weather_rank.finish('城市名称错误')
 
