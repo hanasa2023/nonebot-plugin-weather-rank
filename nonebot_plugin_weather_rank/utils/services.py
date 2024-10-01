@@ -3,14 +3,12 @@ from __future__ import annotations
 from typing import cast
 
 from loguru import logger
-from nonebot import require
+from nonebot_plugin_localstore import get_data_file
 from pydantic import BaseModel
-from sqlalchemy import Select, select
+from tortoise import Tortoise
+from tortoise.transactions import in_transaction
 
 from .schema import Weather
-
-require('nonebot_plugin_orm')
-from nonebot_plugin_orm import get_session  # noqa: E402
 
 
 class LocationInfo(BaseModel):
@@ -27,13 +25,39 @@ class DBService:
         return cast('DBService', cls._instance)
 
     def __init__(self) -> None:
-        if not hasattr(self, 'session'):
-            self.session = get_session()
+        self.initalized = False
+
+    async def init(self):
+        if not self.initalized:
+            self.initalized = True
+            await Tortoise.init(
+                {
+                    'connections': {
+                        'default': {
+                            'engine': 'tortoise.backends.sqlite',
+                            'credentials': {
+                                'file_path': str(
+                                    get_data_file(
+                                        'nonebot-plugin-weather-rank', 'weather.db'
+                                    )
+                                )
+                            },
+                        }
+                    },
+                    'apps': {
+                        'events': {
+                            'models': ['nonebot_plugin_weather_rank.utils.schema'],
+                            'default_connection': 'default',
+                        }
+                    },
+                }
+            )
+            await Tortoise.generate_schemas()
 
     async def add_location_for_group(
         self, group_id: int, location_code: str, location_name: str
     ) -> str:
-        """获取群组订阅的地区
+        """向群组中添加订阅地区
 
         Args:
             group_id (int): 群组id
@@ -43,24 +67,16 @@ class DBService:
         Returns:
             str: 添加成功/失败信息
         """
-        w: Select[tuple[Weather]] = select(Weather).where(
-            Weather.group_id.is_(group_id), Weather.location_code.is_(location_code)
-        )
-        wea: Weather | None = await self.session.scalar(w)
-        if wea:
-            return f'该城市/地区{wea.location_name}已存在'
-        else:
-            async with self.session as session:
-                weather = Weather(
+        async with in_transaction() as _:
+            w = await Weather.filter(group_id=group_id, location_code=location_code)
+            if len(w) != 0:
+                return f'该城市/地区{location_name}已存在'
+            else:
+                await Weather.create(
                     group_id=group_id,
                     location_code=location_code,
                     location_name=location_name,
                 )
-
-                session.add(weather)
-                await session.commit()
-                await session.refresh(weather)
-
                 return f'添加{location_name}成功'
 
     async def get_locations_in_group(self, group_id: int) -> list[LocationInfo]:
@@ -72,28 +88,38 @@ class DBService:
         Returns:
             tuple[list[str], list[str]]: 地区和地区名称列表
         """
-        weathers = select(Weather).where(Weather.group_id.is_(group_id))
-        locations: list[LocationInfo] = []
-        for weather in await self.session.scalars(weathers):
-            locations.append(
-                LocationInfo(
-                    code=weather.location_code,
-                    name=weather.location_name,
+        async with in_transaction() as _:
+            weathers = await Weather.filter(group_id=group_id)
+            locations: list[LocationInfo] = []
+            for weather in weathers:
+                locations.append(
+                    LocationInfo(code=weather.location_code, name=weather.location_name)
                 )
-            )
-        return locations
+
+            return locations
 
     async def remove_location_from_group(
         self, group_id: int, location_code: str
-    ) -> None:
-        async with self.session as session:
-            location: Select[tuple[Weather]] = select(Weather).where(
-                Weather.group_id.is_(group_id), Weather.location_code.is_(location_code)
+    ) -> str:
+        """从群组中删除城市
+
+        Args:
+            group_id (int): 群组id
+            location_code (str): 地区代码
+
+        Returns:
+            str: _description_
+        """
+        async with in_transaction() as _:
+            logger.debug(f'group id is {group_id}, location is {location_code}')
+            location = await Weather.filter(
+                group_id=group_id, location_code=location_code
             )
+
             logger.info(f'location : {location}')
-            for loc in await session.scalars(location):
-                await session.delete(loc)
-            await session.commit()
+            for loc in location:
+                await Weather.delete(loc)
+            return f'删除{location[0].location_name}成功'
 
     @classmethod
     def get_instance(cls) -> 'DBService':

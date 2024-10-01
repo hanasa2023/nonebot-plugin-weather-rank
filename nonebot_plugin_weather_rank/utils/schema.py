@@ -1,12 +1,9 @@
-from nonebot import require
-from sqlalchemy.orm import Mapped, mapped_column
-
-require('nonebot_plugin_orm')
-from nonebot_plugin_orm import Model  # noqa: E402
+from tortoise import fields
+from tortoise.models import Model
 
 
 class Weather(Model):
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    group_id: Mapped[int]
-    location_code: Mapped[str]
-    location_name: Mapped[str]
+    id = fields.IntField(True, generated=True)
+    group_id = fields.TextField()
+    location_code = fields.TextField()
+    location_name = fields.TextField()
