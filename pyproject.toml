@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-weather-rank"
-version = "0.1.6"
+version = "0.1.7"
 description = "一个比较群友地区天气温度的插件"
 authors = ["hanasa2023 <hanasakayui2022@gmail.com>"]
 license = "MIT"
@@ -52,5 +52,5 @@ adapters = [
     { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
 ]
 plugins = []
-plugin_dirs = ["nonebot_plugin_weather_rank/"]
+plugin_dirs = [""]
 builtin_plugins = []

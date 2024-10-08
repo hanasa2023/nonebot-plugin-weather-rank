@@ -10,7 +10,7 @@ from tortoise.transactions import in_transaction
 
 from .schema import Weather
 
-require('nonebot_plugin_localsotre')
+require('nonebot_plugin_localstore')
 from nonebot_plugin_localstore import get_data_file  # noqa: E402
 
 
