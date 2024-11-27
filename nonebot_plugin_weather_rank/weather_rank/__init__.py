@@ -8,8 +8,6 @@ import httpx
 from bs4 import BeautifulSoup, Tag
 from nonebot import logger, require
 from nonebot.adapters import Event
-from nonebot_plugin_htmlrender.data_source import aiofiles
-from tarina.lang import json
 
 from ..config import plugin_config
 from ..utils.addition_for_htmlrender import md_to_pic, template_element_to_pic
@@ -17,7 +15,6 @@ from ..utils.constant import (
     AIR_QUALITY_BASE_URL,
     CITY_SEARCH_BASE_URL,
     DAILY_WEATHER_SEARCH_BASE_URL,
-    GROUT_LIST_LOCATION,
     HOURLY_WEATHER_SEARCH_BASE_URL,
     NOW_WEATHER_SEARCH_BASE_URL,
     TEMPERATURE_MAP_BASE_URL,
@@ -70,7 +67,7 @@ weather_rank_commands: Alconna[Any] = Alconna(
         Args['city', str, Field(completion=lambda: '请输入要查询的城市名称')],
     ),
     Subcommand('订阅'),
-    Subcommand('取消订阅')
+    Subcommand('取消订阅'),
 )
 
 weather_rank: type[AlconnaMatcher] = on_alconna(
@@ -87,22 +84,27 @@ weather_rank_helper: type[AlconnaMatcher] = on_alconna(
     command=helper, aliases={'weather_rank_helper'}, use_cmd_start=True
 )
 
-@scheduler.scheduled_job("cron", hour=plugin_config.schedule_hour, minute=plugin_config.schedule_minute, id="send_weather_info")
+
+@scheduler.scheduled_job(
+    'cron',
+    hour=plugin_config.schedule_hour,
+    minute=plugin_config.schedule_minute,
+    id='send_weather_info',
+)
 async def _() -> None:
     dbs: DBService = DBService.get_instance()
     await dbs.init()
-    async with aiofiles.open(GROUT_LIST_LOCATION) as f:
-        file_content: str = await f.read()
-        ids: list[int] = json.loads(file_content)
 
-    for id in ids:
+    group_ids: list[int] = await dbs.get_subscribed_groups()
+
+    for id in group_ids:
         target: Target = Target(str(id))
 
         if plugin_config.schedule_switch:
             logger.info('开始推送天气')
-            locations: list[LocationInfo] = await dbs.get_locations_in_group(id)
+            locations: list[LocationInfo] = await dbs.get_locations_in_group(int(id))
             weathers: list[WeatherData] = []
-            modes: list[str]  = ['气温', '温差']
+            modes: list[str] = ['气温', '温差']
             for mode in modes:
                 for location in locations:
                     async with httpx.AsyncClient() as ctx:
@@ -115,10 +117,14 @@ async def _() -> None:
                             if mode == '气温':
                                 now_weather: NowWeather = NowWeather(**response.json())
                                 weathers.append(
-                                    WeatherData(name=location.name, temp=now_weather.now.temp)
+                                    WeatherData(
+                                        name=location.name, temp=now_weather.now.temp
+                                    )
                                 )
                             elif mode == '温差':
-                                daily_weather: DailyWeather = DailyWeather(**response.json())
+                                daily_weather: DailyWeather = DailyWeather(
+                                    **response.json()
+                                )
                                 weathers.append(
                                     WeatherData(
                                         name=location.name,
@@ -129,7 +135,9 @@ async def _() -> None:
                                     )
                                 )
                         else:
-                            await UniMessage.text(f'获取{location.name}天气信息失败').send(target)
+                            await UniMessage.text(
+                                f'获取{location.name}天气信息失败'
+                            ).send(target)
                 # 对各地气温/温差进行排序
                 weathers.sort(key=lambda x: int(x.temp), reverse=True)
 
@@ -137,7 +145,6 @@ async def _() -> None:
                 template_path: str = str(Path(__file__).parent / 'templates')
                 template_name: str = 'rank_card.html.jinja2'
 
-                await UniMessage.text('正在生成排行榜……').send(target)
                 rank_img: bytes = await template_element_to_pic(
                     template_path,
                     template_name,
@@ -148,8 +155,6 @@ async def _() -> None:
                 )
 
                 await UniMessage().image(raw=rank_img).send(target)
-
-
 
 
 @weather_rank_helper.handle()
@@ -380,17 +385,9 @@ async def _(event: Event, result: Arparma) -> None:
                 await weather_rank.finish(msg3)
 
     if '订阅' in result.subcommands:
-        async with aiofiles.open(GROUT_LIST_LOCATION) as f:
-            file_content: str =await f.read()
-            group_list: list[int] = json.loads(file_content)
-            if id not in group_list:
-                group_list.append(id)
-                json.dump(group_list, f, ensure_ascii=False, indent=4)
+        m: str = await dbs.add_subscribed_group(id)
+        await weather_rank.finish(m)
 
     if '取消订阅' in result.subcommands:
-        async with aiofiles.open(GROUT_LIST_LOCATION) as f:
-            fc: str =await f.read()
-            gl: list[int] = json.loads(fc)
-            if id  in gl:
-                gl.remove(id)
-                json.dump(gl, f, ensure_ascii=False, indent=4)
+        _m: str = await dbs.remove_subscribed_group(id)
+        await weather_rank.finish(_m)

@@ -8,10 +8,10 @@ from pydantic import BaseModel
 from tortoise import Tortoise
 from tortoise.transactions import in_transaction
 
-from .schema import Weather
+from .schema import Weather, WeatherSubscribed
 
 require('nonebot_plugin_localstore')
-from nonebot_plugin_localstore import get_data_file  # noqa: E402
+from nonebot_plugin_localstore import get_plugin_data_file  # noqa: E402
 
 
 class LocationInfo(BaseModel):
@@ -39,11 +39,7 @@ class DBService:
                         'default': {
                             'engine': 'tortoise.backends.sqlite',
                             'credentials': {
-                                'file_path': str(
-                                    get_data_file(
-                                        'nonebot-plugin-weather-rank', 'weather.db'
-                                    )
-                                )
+                                'file_path': str(get_plugin_data_file('weather.db'))
                             },
                         }
                     },
@@ -123,6 +119,51 @@ class DBService:
             for loc in location:
                 await Weather.delete(loc)
             return f'删除{location[0].location_name}成功'
+
+    async def get_subscribed_groups(self) -> list[int]:
+        """获取已订阅的群组
+
+        Returns:
+            List[str]: 群组id列表
+        """
+        async with in_transaction() as _:
+            groups: list[WeatherSubscribed] = await WeatherSubscribed.all()
+            return [group.group_id for group in groups]
+
+    async def add_subscribed_group(self, group_id: int) -> str:
+        """添加订阅群组
+
+        Args:
+            group_id (str): 群组id
+
+        Returns:
+            str: 订阅成功信息
+        """
+        try:
+            async with in_transaction() as _:
+                await WeatherSubscribed.create(group_id=group_id)
+                return '订阅成功'
+        except Exception as _:
+            return '已经订阅过了'
+
+    async def remove_subscribed_group(self, group_id: int) -> str:
+        """移除订阅群组
+
+        Args:
+            group_id (str): 群组id
+
+        Returns:
+            str: 移除成功信息
+        """
+        async with in_transaction() as _:
+            group: list[WeatherSubscribed] = await WeatherSubscribed.filter(
+                group_id=group_id
+            )
+            if len(group) == 0:
+                return f'群组{group_id}未订阅'
+            else:
+                await WeatherSubscribed.delete(group[0])
+                return '取消订阅成功'
 
     @classmethod
     def get_instance(cls) -> 'DBService':
