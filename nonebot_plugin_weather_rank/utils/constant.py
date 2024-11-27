@@ -1,4 +1,9 @@
+from nonebot import require
+
 from ..config import plugin_config
+
+require('nonebot_plugin_localstore')
+from nonebot_plugin_localstore import get_plugin_data_dir  # noqa: E402
 
 NOW_WEATHER_SEARCH_BASE_URL = (
     'https://devapi.qweather.com/v7/weather/now?'
@@ -24,3 +29,5 @@ CITY_SEARCH_BASE_URL = 'https://geoapi.qweather.com/v2/city/lookup?'
 TEMPERATURE_MAP_BASE_URL = (
     'http://www.nmc.cn/publish/observations/hourly-temperature.html'
 )
+
+GROUT_LIST_LOCATION = get_plugin_data_dir() / 'schedule_groups.json'
