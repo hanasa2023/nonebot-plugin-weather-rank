@@ -1,3 +1,8 @@
+from nonebot import require
+
+require('nonebot_plugin_localstore')
+from nonebot_plugin_localstore import get_plugin_data_dir
+
 from ..config import plugin_config
 
 
@@ -25,3 +30,4 @@ CITY_SEARCH_BASE_URL = 'https://geoapi.qweather.com/v2/city/lookup?'
 TEMPERATURE_MAP_BASE_URL = (
     'http://www.nmc.cn/publish/observations/hourly-temperature.html'
 )
+ASSETS_DIR = get_plugin_data_dir() / 'assets'

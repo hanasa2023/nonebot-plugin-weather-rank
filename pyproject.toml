@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-weather-rank"
-version = "0.1.8"
+version = "0.1.9"
 description = "一个比较群友地区天气温度的插件"
 authors = ["hanasa2023 <hanasakayui2022@gmail.com>"]
 license = "MIT"
@@ -42,6 +42,10 @@ typeCheckingMode = "standard"
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "UP", "C", "T", "PYI", "PT", "Q"]
+ignore = ["E402", "C901", "F401", "Q000"]
 
 [build-system]
 requires = ["poetry-core"]

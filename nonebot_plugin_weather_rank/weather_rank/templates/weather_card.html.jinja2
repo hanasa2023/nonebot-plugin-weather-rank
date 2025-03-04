@@ -6,9 +6,19 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
   <style>
+    @font-face {
+        font-family: "CustomEN";
+        src: url({{ custom_en }});
+    }
+
+    @font-face {
+        font-family: "CustomZH";
+        src: url({{ custom_zh }});
+    }
+
     body {
       color: #f3e5f5;
-      font-family: "Arial", sans-serif;
+      font-family: {{ "CustomEN" if custom_en != custom_font_dir else "Arial" }}, {{ "CustomZH" if custom_zh != custom_font_dir else "sans-serif" }};
     }
 
     i {

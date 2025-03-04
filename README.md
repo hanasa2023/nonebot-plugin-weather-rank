@@ -73,13 +73,18 @@ nb orm downgrade nonebot_plugin_wordcloud@base  # 降级数据库，删除数据
 
 🔧 请在你的 bot 根目录下的`.env` `.env.*`中添加以下字段
 
-|        字段        | 类型 | 默认值 |   可选值   |                               描述                               |
-| :----------------: | :--: | :----: | :--------: | :--------------------------------------------------------------: |
-|  QWEATHER_API_KEY  | str  |   无   |     无     |                         和风天气 api key                         |
-| QWEATHER_RANK_MODE | int  |   0    |    0/1     | 调用和风天气 api 的模式，0 为免费订阅模式，1 为标准/高级订阅模式 |
-|   SCHEDULE_HOUR    | int  |   8    |   0 - 23   |                          推送的时间(h)                           |
-|  SCHEDULE_MINUTE   | int  |   0    |   0 - 59   |                         推送的时间(min)                          |
-|  SCHEDULE_SWITCH   | bool |  True  | True/False |                           全局推送开关                           |
+> [!TIP]
+> 自定义字体应被放置在`<data_path>\assets\fonts`目录下，其中`<data_path>`为[nonebot-plugin-localstore](https://github.com/nonebot/plugin-localstore#data-path)所定义的**data path**。
+
+|          字段          | 类型 | 默认值 |   可选值   |                               描述                               |
+| :--------------------: | :--: | :----: | :--------: | :--------------------------------------------------------------: |
+|    QWEATHER_API_KEY    | str  |   无   |     无     |                         和风天气 api key                         |
+|   QWEATHER_RANK_MODE   | int  |   0    |    0/1     | 调用和风天气 api 的模式，0 为免费订阅模式，1 为标准/高级订阅模式 |
+|     SCHEDULE_HOUR      | int  |   8    |   0 - 23   |                          推送的时间(h)                           |
+|    SCHEDULE_MINUTE     | int  |   0    |   0 - 59   |                         推送的时间(min)                          |
+|    SCHEDULE_SWITCH     | bool |  True  | True/False |                           全局推送开关                           |
+| WEACHER_CUSTOM_FONT_ZH | str  |   ''   |    '无'    |                          自定义中文字体                          |
+| WEACHER_CUSTOM_FONT_EN | str  |   ''   |    '无'    |                          自定义英文字体                          |
 
 ### ✨ 功能介绍
 

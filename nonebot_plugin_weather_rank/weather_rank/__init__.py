@@ -9,10 +9,11 @@ from bs4 import BeautifulSoup, Tag
 from nonebot import logger, require
 from nonebot.adapters import Event
 
-from ..config import plugin_config
+from ..config import DRIVER, plugin_config
 from ..utils.addition_for_htmlrender import md_to_pic, template_element_to_pic
 from ..utils.constant import (
     AIR_QUALITY_BASE_URL,
+    ASSETS_DIR,
     CITY_SEARCH_BASE_URL,
     DAILY_WEATHER_SEARCH_BASE_URL,
     HOURLY_WEATHER_SEARCH_BASE_URL,
@@ -46,6 +47,14 @@ from nonebot_plugin_alconna import (  # noqa: E402
 
 require('nonebot_plugin_apscheduler')
 from nonebot_plugin_apscheduler import scheduler  # noqa: E402
+
+
+@DRIVER.on_startup
+def _() -> None:
+    ASSETS_DIR.mkdir(exist_ok=True)
+    font_dir: Path = ASSETS_DIR / 'fonts'
+    font_dir.mkdir(exist_ok=True)
+
 
 weather_rank_commands: Alconna[Any] = Alconna(
     '天气',
@@ -97,8 +106,37 @@ async def _() -> None:
 
     group_ids: list[int] = await dbs.get_subscribed_groups()
 
+    font_dir: Path = ASSETS_DIR / 'fonts'
+    custom_zh_font_path: Path = font_dir / plugin_config.weather_custom_font_zh
+    custom_en_font_path: Path = font_dir / plugin_config.weather_custom_font_en
+
     for id in group_ids:
         target: Target = Target(str(id))
+        if (
+            plugin_config.weather_custom_font_en != ''
+            and not custom_en_font_path.exists()
+        ) or (
+            plugin_config.weather_custom_font_zh != ''
+            and not custom_zh_font_path.exists()
+        ):
+            await (
+                UniMessage()
+                .text(
+                    '自定义字体缺失: '
+                    + (
+                        str(custom_en_font_path.absolute())
+                        if not custom_en_font_path.exists()
+                        else ''
+                    )
+                    + (
+                        str(custom_zh_font_path.absolute())
+                        if not custom_zh_font_path.exists()
+                        else ''
+                    )
+                )
+                .send(target)
+            )
+            continue
 
         if plugin_config.schedule_switch:
             logger.info('开始推送天气')
@@ -111,7 +149,8 @@ async def _() -> None:
                         response: httpx.Response = await ctx.get(
                             f'{NOW_WEATHER_SEARCH_BASE_URL}location={location.code}&key={plugin_config.qweather_api_key}'
                             if mode == '气温'
-                            else f'{DAILY_WEATHER_SEARCH_BASE_URL}location={location.code}&key={plugin_config.qweather_api_key}'
+                            else f'{DAILY_WEATHER_SEARCH_BASE_URL}location='
+                            + f'{location.code}&key={plugin_config.qweather_api_key}'
                         )
                         if response.status_code == 200:
                             if mode == '气温':
@@ -148,7 +187,13 @@ async def _() -> None:
                 rank_img: bytes = await template_element_to_pic(
                     template_path,
                     template_name,
-                    templates={'datas': weathers, 'mode': mode},
+                    templates={
+                        'datas': weathers,
+                        'mode': mode,
+                        'custom_font_dir': font_dir.as_posix(),
+                        'custom_en': custom_en_font_path.as_posix(),
+                        'custom_zh': custom_zh_font_path.as_posix(),
+                    },
                     element='.container',
                     wait=2,
                     omit_background=True,
@@ -159,7 +204,7 @@ async def _() -> None:
 
 @weather_rank_helper.handle()
 async def _() -> None:
-    with open(Path(__file__).parent / 'help.md', 'r', encoding='utf-8') as f:
+    with open(Path(__file__).parent / 'help.md', encoding='utf-8') as f:
         md: str = f.read()
     help_img: bytes = await md_to_pic(md=md, width=720)
     msg: UniMessage[Image] = UniMessage().image(raw=help_img)
@@ -171,6 +216,10 @@ async def _(event: Event, result: Arparma) -> None:
     dbs: DBService = DBService.get_instance()
     await dbs.init()
     id: int = int(UniMessage.get_target(event).id)
+
+    font_dir = ASSETS_DIR / 'fonts'
+    custom_zh_font_path: Path = font_dir / plugin_config.weather_custom_font_zh
+    custom_en_font_path: Path = font_dir / plugin_config.weather_custom_font_en
 
     if '添加城市' in result.subcommands:
         # 如果匹配至'添加城市'子命令，则通过api获取城市地区码，并写入数据库
@@ -211,6 +260,26 @@ async def _(event: Event, result: Arparma) -> None:
 
     if '排行榜' in result.subcommands:
         # 如果匹配至'排行榜'，则通过api获取当日订阅地区的实时/近7日气温(由具体模式决定)
+        if (
+            plugin_config.weather_custom_font_en != ''
+            and not custom_en_font_path.exists()
+        ) or (
+            plugin_config.weather_custom_font_zh != ''
+            and not custom_zh_font_path.exists()
+        ):
+            await weather_rank.finish(
+                '自定义字体缺失: '
+                + (
+                    str(custom_en_font_path.absolute())
+                    if not custom_en_font_path.exists()
+                    else ''
+                )
+                + (
+                    str(custom_zh_font_path.absolute())
+                    if not custom_zh_font_path.exists()
+                    else ''
+                )
+            )
         mode: str = result.subcommands['排行榜'].args['mode']
         if mode not in ['气温', '温差']:
             await weather_rank.finish('不支持的排行榜')
@@ -221,7 +290,8 @@ async def _(event: Event, result: Arparma) -> None:
                 response: httpx.Response = await ctx.get(
                     f'{NOW_WEATHER_SEARCH_BASE_URL}location={location.code}&key={plugin_config.qweather_api_key}'
                     if mode == '气温'
-                    else f'{DAILY_WEATHER_SEARCH_BASE_URL}location={location.code}&key={plugin_config.qweather_api_key}'
+                    else f'{DAILY_WEATHER_SEARCH_BASE_URL}location={location.code}'
+                    + f'&key={plugin_config.qweather_api_key}'
                 )
                 if response.status_code == 200:
                     if mode == '气温':
@@ -253,7 +323,13 @@ async def _(event: Event, result: Arparma) -> None:
         rank_img: bytes = await template_element_to_pic(
             template_path,
             template_name,
-            templates={'datas': weathers, 'mode': mode},
+            templates={
+                'datas': weathers,
+                'mode': mode,
+                'custom_font_dir': font_dir.as_posix(),
+                'custom_en': custom_en_font_path.as_posix(),
+                'custom_zh': custom_zh_font_path.as_posix(),
+            },
             element='.container',
             wait=2,
             omit_background=True,
@@ -285,6 +361,26 @@ async def _(event: Event, result: Arparma) -> None:
 
     if '当地天气' in result.subcommands:
         # 如果匹配至'当地天气'，则获取该地气温并绘制当地天气图
+        if (
+            plugin_config.weather_custom_font_en != ''
+            and not custom_en_font_path.exists()
+        ) or (
+            plugin_config.weather_custom_font_zh != ''
+            and not custom_zh_font_path.exists()
+        ):
+            await weather_rank.finish(
+                '自定义字体缺失: '
+                + (
+                    str(custom_en_font_path.absolute())
+                    if not custom_en_font_path.exists()
+                    else ''
+                )
+                + (
+                    str(custom_zh_font_path.absolute())
+                    if not custom_zh_font_path.exists()
+                    else ''
+                )
+            )
         query_city: str = result.subcommands['当地天气'].args['city']
         async with httpx.AsyncClient() as ctx:
             location_c: str = ''
@@ -375,7 +471,12 @@ async def _(event: Event, result: Arparma) -> None:
                 weather_img: bytes = await template_element_to_pic(
                     template_p,
                     template_n,
-                    templates={'data': weather_card_data},
+                    templates={
+                        'data': weather_card_data,
+                        'custom_font_dir': font_dir.as_posix(),
+                        'custom_en': custom_en_font_path.as_posix(),
+                        'custom_zh': custom_zh_font_path.as_posix(),
+                    },
                     element='.container',
                     wait=2,
                     omit_background=True,

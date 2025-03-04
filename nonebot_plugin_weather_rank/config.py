@@ -10,6 +10,8 @@ class Config(BaseModel):
     schedule_hour: int = 8
     schedule_minute: int = 0
     schedule_switch: bool = True
+    weather_custom_font_zh: str = ''
+    weather_custom_font_en: str = ''
 
 
 plugin_config: Config = get_plugin_config(Config)

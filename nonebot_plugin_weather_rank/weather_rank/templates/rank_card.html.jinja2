@@ -15,6 +15,16 @@
             src: url("./fonts/ComicShannsMonoNerdFont-Regular.otf") format("truetype");
         }
 
+        @font-face {
+            font-family: "CustomEN";
+            src: url({{ custom_en }});
+        }
+
+        @font-face {
+            font-family: "CustomZH";
+            src: url({{ custom_zh }});
+        }
+
         .container {
             width: 432px;
             height: auto;
@@ -35,7 +45,7 @@
             align-items: center;
             justify-content: center;
             background: linear-gradient(to right, #ff9e80, #ff5722, #ff9e80);
-            font-family: "ComicSannsMonoNF", "MeiWeiTi";
+            font-family: {{ "CustomEN" if custom_en != custom_font_dir else "ComicSannsMonoNF" }}, {{ "CustomZH" if custom_zh != custom_font_dir else "MeiWeiTi" }};
             font-size: 24px;
             font-weight: bold;
         }
@@ -49,7 +59,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: "ComicSannsMonoNF", "MeiWeiTi";
+            font-family: {{ "CustomEN" if custom_en != custom_font_dir else "ComicSannsMonoNF" }}, {{ "CustomZH" if custom_zh != custom_font_dir else "MeiWeiTi" }};
             font-size: 16px;
             color: white;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
@@ -64,7 +74,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: "ComicSannsMonoNF", "MeiWeiTi";
+            font-family: {{ "CustomEN" if custom_en != custom_font_dir else "ComicSannsMonoNF" }}, {{ "CustomZH" if custom_zh != custom_font_dir else "MeiWeiTi" }};
             font-size: 16px;
             color: white;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
