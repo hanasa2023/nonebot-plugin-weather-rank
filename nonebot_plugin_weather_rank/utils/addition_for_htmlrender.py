@@ -32,7 +32,9 @@ async def template_element_to_pic(
         wait (float, optional): 网页载入等待时间. Defaults to 0.
         type (Literal["jpeg", "png"]): 图片类型, 默认 png
         quality (int, optional): 图片质量 0-100 当为`png`时无效
-        device_scale_factor (float, optional): 缩放比例,类型为float,值越大越清晰(真正想让图片清晰更优先请调整此选项)
+        device_scale_factor (float, optional):
+            缩放比例,类型为float,值越大越清晰
+            (真正想让图片清晰更优先请调整此选项)
         filters (dict[str, Any] | None, optional): 自定义过滤器
         omit_background (bool | None, optional): 截图背景是否透明
         **kwargs: 传入 page 的参数

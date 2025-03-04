@@ -13,3 +13,4 @@ repos:
         stages: [pre-commit]
       - id: ruff
         stages: [pre-commit]
+        args: ["--fix"]

@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_get_map() -> None:
     import re
 

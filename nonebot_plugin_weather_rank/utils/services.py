@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import cast, Self
 
 from loguru import logger
 from nonebot import require
@@ -20,12 +20,12 @@ class LocationInfo(BaseModel):
 
 
 class DBService:
-    _instance: 'DBService | None' = None
+    _instance: Self | None = None
 
-    def __new__(cls, *args, **kwargs) -> 'DBService':
+    def __new__(cls, *args, **kwargs) -> Self:
         if cls._instance is None:
-            cls._instance = super(DBService, cls).__new__(cls, *args, **kwargs)
-        return cast('DBService', cls._instance)
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
 
     def __init__(self) -> None:
         self.initalized = False
@@ -166,7 +166,7 @@ class DBService:
                 return '取消订阅成功'
 
     @classmethod
-    def get_instance(cls) -> 'DBService':
+    def get_instance(cls) -> DBService:
         """获取Weather单例
 
         Returns:
