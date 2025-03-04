@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import cast, Self
+from typing import cast
+from typing_extensions import Self
 
 from loguru import logger
 from nonebot import require
@@ -25,7 +26,7 @@ class DBService:
     def __new__(cls, *args, **kwargs) -> Self:
         if cls._instance is None:
             cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
+        return cast(Self, cls._instance)
 
     def __init__(self) -> None:
         self.initalized = False
