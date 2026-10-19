@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import cast
-from typing_extensions import Self
+from typing import Self
 
 from loguru import logger
 from nonebot import require
